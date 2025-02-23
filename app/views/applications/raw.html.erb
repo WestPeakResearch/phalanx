@@ -1,0 +1,46 @@
+<h1>Raw Applications Data</h1>
+
+<div class="column-picker mb-3">
+  <%= form_tag raw_applications_path, method: :get do %>
+    <label for="visible_columns">Select columns to display:</label>
+    <%= select_tag 'visible_columns[]',
+        options_for_select(Application.displayable_columns, params[:visible_columns] || Application.default_visible_columns),
+        multiple: true,
+        class: 'form-control',
+        data: { controller: 'select' } %>
+    <%= submit_tag 'Update View', class: 'btn btn-primary mt-2' %>
+  <% end %>
+</div>
+
+<div id="applications">
+  <table class="table">
+    <thead>
+      <tr>
+        <% (params[:visible_columns] || Application.default_visible_columns).each do |column_name| %>
+          <th><%= column_name.humanize %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% @applications.each do |application| %>
+        <tr>
+          <% (params[:visible_columns] || Application.default_visible_columns).each do |column_name| %>
+            <td><%= application.send(column_name) %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%# Keep the Select2 initialization %>
+<% content_for :head do %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      $('#visible_columns').select2({
+        placeholder: 'Select columns to display',
+        width: '100%'
+      });
+    });
+  </script>
+<% end %> 

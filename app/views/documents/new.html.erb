@@ -1,0 +1,6 @@
+<%= form_with(model: @document, local: true) do |form| %>
+  <%= form.label :file, "Upload Excel File" %>
+  <%= form.file_field :file %>
+
+  <%= form.submit "Upload" %>
+<% end %>

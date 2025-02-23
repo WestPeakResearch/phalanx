@@ -1,0 +1,16 @@
+<div class="grid-row" id="application_<%= application.id %>">
+  <div class="grid-cell"><%= application.first_name %></div>
+  <div class="grid-cell"><%= application.last_name %></div>
+  <div class="grid-cell">
+    <div class="review-boxes">
+      <% application.initial_reviews.each do |review| %>
+        <div class="review-box review-<%= review.decision %>" 
+             title="Reviewed by <%= review.reviewer %>: <%= review.decision.upcase %>">
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="grid-cell">
+    <%= link_to "See Application", application_path(application), class: "btn btn-sm btn-primary" %>
+  </div>
+</div> 

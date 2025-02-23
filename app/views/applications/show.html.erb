@@ -1,0 +1,39 @@
+<div class="container mt-4">
+  <h1>Application Details</h1>
+  
+  <div class="card">
+    <div class="card-body">
+      <table class="table table-bordered">
+        <tbody>
+          <% Application.displayable_columns.each_slice(2) do |left_col, right_col| %>
+            <tr>
+              <% if left_col %>
+                <th class="bg-light" style="width: 20%"><%= left_col.humanize %></th>
+                <td style="width: 30%">
+                  <% if left_col == "resume" && @application.resume.present? %>
+                    <%= link_to @application.resume, @application.resume, target: "_blank" %>
+                  <% else %>
+                    <%= @application.send(left_col) %>
+                  <% end %>
+                </td>
+              <% end %>
+              
+              <% if right_col %>
+                <th class="bg-light" style="width: 20%"><%= right_col.humanize %></th>
+                <td style="width: 30%">
+                  <% if right_col == "resume" && @application.resume.present? %>
+                    <%= link_to @application.resume, @application.resume, target: "_blank" %>
+                  <% else %>
+                    <%= @application.send(right_col) %>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%= link_to "Back to Applications", applications_path, class: "btn btn-primary mt-3" %>
+</div> 

@@ -1,0 +1,23 @@
+<h1>Initial Review Overview</h1>
+
+<div class="mb-4 text-center">
+  <%= link_to "Start Reviewing", review_one_initial_reviews_path, class: "btn btn-lg btn-success" %>
+</div>
+
+<%= turbo_stream_from "applications" %>
+
+<% @applications.group_by(&:year).sort.each do |year, applications| %>
+  <h2>Year <%= year %></h2>
+  <div class="reviews-grid mb-4">
+    <%# Headers %>
+    <div class="grid-header">First Name</div>
+    <div class="grid-header">Last Name</div>
+    <div class="grid-header">Review Status</div>
+    <div class="grid-header">Actions</div>
+
+    <%# Rows %>
+    <% applications.each do |application| %>
+      <%= render "application_row", application: application %>
+    <% end %>
+  </div>
+<% end %> 

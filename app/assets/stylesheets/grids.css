@@ -1,0 +1,74 @@
+/* Grid Layout */
+.reviews-grid, .applications-grid {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.reviews-grid {
+  grid-template-columns: 1fr 1fr 3fr 1fr;
+}
+
+.applications-grid {
+  grid-template-columns: 1fr 1fr 1fr 2fr 1fr 3fr 1fr;
+}
+
+.grid-header {
+  font-weight: bold;
+  background-color: #f8f9fa;
+  padding: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.grid-cell {
+  padding: 8px;
+  border: 1px solid #dee2e6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grid-row {
+  display: contents;
+}
+
+/* Review Boxes */
+.review-boxes {
+  display: flex;
+  gap: 4px;
+}
+
+.review-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+.review-yes {
+  background-color: #28a745;  /* green */
+}
+
+.review-maybe {
+  background-color: #ffc107;  /* yellow */
+}
+
+.review-no {
+  background-color: #dc3545;  /* red */
+}
+
+/* Add to your existing CSS */
+.review-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.review-buttons .btn {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+}
+
+/* Add to your existing review box styles */
+.review-pending {
+  background-color: #6c757d;  /* grey */
+} 

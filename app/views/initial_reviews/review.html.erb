@@ -1,0 +1,61 @@
+<div class="container mt-4">
+  <h1>Review Application</h1>
+
+  <div class="review-buttons mb-4">
+    <%= button_to submit_review_path(@application, decision: :yes), 
+                  method: :post,
+                  class: "btn btn-success" do %>
+      Accept <i class="fas fa-check"></i>
+    <% end %>
+
+    <%= button_to submit_review_path(@application, decision: :maybe), 
+                  method: :post,
+                  class: "btn btn-warning" do %>
+      Maybe <i class="fas fa-question"></i>
+    <% end %>
+
+    <%= button_to submit_review_path(@application, decision: :no), 
+                  method: :post,
+                  class: "btn btn-danger" do %>
+      Reject <i class="fas fa-times"></i>
+    <% end %>
+
+    <%= button_to submit_review_path(@application, skip: true), 
+                  method: :post,
+                  class: "btn btn-secondary" do %>
+      DO NOT REVIEW <i class="fas fa-ban"></i>
+    <% end %>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <% Application.displayable_columns.each do |column_name| %>
+        <div class="row mb-3">
+          <div class="col-md-3 font-weight-bold">
+            <%= column_name.humanize %>:
+          </div>
+          <div class="col-md-9">
+            <% if column_name == "resume" && @application.resume.present? %>
+              <%= link_to @application.resume, @application.resume, target: "_blank" %>
+            <% else %>
+              <%= @application.send(column_name) %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @application.initial_reviews.any? %>
+        <div class="mt-4">
+          <h4>Existing Reviews</h4>
+          <div class="review-boxes">
+            <% @application.initial_reviews.each do |review| %>
+              <div class="review-box review-<%= review.decision %>" 
+                   title="Reviewed by <%= review.reviewer %>: <%= review.decision.upcase %>">
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div> 

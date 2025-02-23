@@ -1,0 +1,46 @@
+<h1>Applications</h1>
+
+<% @applications.group_by(&:year).sort.each do |year, applications| %>
+  <h2>Year <%= year %></h2>
+  <div class="applications-grid mb-4">
+    <%# Headers %>
+    <div class="grid-header">First Name</div>
+    <div class="grid-header">Last Name</div>
+    <div class="grid-header">Faculty</div>
+    <div class="grid-header">Major</div>
+    <div class="grid-header">Grad Year</div>
+    <div class="grid-header">Resume</div>
+    <div class="grid-header">Actions</div>
+
+    <%# Rows %>
+    <% applications.each do |application| %>
+      <div class="grid-row">
+        <div class="grid-cell"><%= application.first_name %></div>
+        <div class="grid-cell"><%= application.last_name %></div>
+        <div class="grid-cell"><%= application.faculty %></div>
+        <div class="grid-cell"><%= application.major %></div>
+        <div class="grid-cell"><%= application.grad_year %></div>
+        <div class="grid-cell">
+          <% if application.resume.present? %>
+            <%= link_to application.resume, application.resume, target: "_blank" %>
+          <% end %>
+        </div>
+        <div class="grid-cell">
+          <%= link_to "See More", application_path(application), class: "btn btn-sm btn-primary" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<%# Keep the Select2 initialization %>
+<% content_for :head do %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      $('#visible_columns').select2({
+        placeholder: 'Select columns to display',
+        width: '100%'
+      });
+    });
+  </script>
+<% end %>
