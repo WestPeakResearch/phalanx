@@ -22,7 +22,13 @@
                 <th class="bg-light" style="width: 20%"><%= right_col.humanize %></th>
                 <td style="width: 30%">
                   <% if right_col == "resume" && @application.resume.present? %>
-                    <%= link_to @application.resume, @application.resume, target: "_blank" %>
+                    <div class="resume-preview" style="width: 100%; height: 600px;">
+                      <iframe 
+                        src="https://drive.google.com/file/d/<%= @application.resume.split('id=').last %>/preview"
+                        style="width: 100%; height: 100%; border: none;"
+                        allow="autoplay">
+                      </iframe>
+                    </div>
                   <% else %>
                     <%= @application.send(right_col) %>
                   <% end %>

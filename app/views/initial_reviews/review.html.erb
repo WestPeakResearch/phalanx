@@ -1,48 +1,49 @@
 <div class="container mt-4">
   <h1>Review Application</h1>
 
-  <div class="review-buttons mb-4">
-    <%= button_to submit_review_path(@application, decision: :yes), 
-                  method: :post,
-                  class: "btn btn-success" do %>
-      Accept <i class="fas fa-check"></i>
-    <% end %>
+  <%= render 'review_buttons', application: @application %>
 
-    <%= button_to submit_review_path(@application, decision: :maybe), 
-                  method: :post,
-                  class: "btn btn-warning" do %>
-      Maybe <i class="fas fa-question"></i>
-    <% end %>
-
-    <%= button_to submit_review_path(@application, decision: :no), 
-                  method: :post,
-                  class: "btn btn-danger" do %>
-      Reject <i class="fas fa-times"></i>
-    <% end %>
-
-    <%= button_to submit_review_path(@application, skip: true), 
-                  method: :post,
-                  class: "btn btn-secondary" do %>
-      DO NOT REVIEW <i class="fas fa-ban"></i>
-    <% end %>
-  </div>
-
-  <div class="card">
+  <div class="card mb-4">
     <div class="card-body">
-      <% Application.displayable_columns.each do |column_name| %>
-        <div class="row mb-3">
-          <div class="col-md-3 font-weight-bold">
-            <%= column_name.humanize %>:
-          </div>
-          <div class="col-md-9">
-            <% if column_name == "resume" && @application.resume.present? %>
-              <%= link_to @application.resume, @application.resume, target: "_blank" %>
-            <% else %>
-              <%= @application.send(column_name) %>
-            <% end %>
-          </div>
+      <% if @application.resume.present? %>
+        <div class="resume-preview mb-4" style="width: 100%; height: 600px;">
+          <iframe 
+            src="https://drive.google.com/file/d/<%= @application.resume.split('id=').last %>/preview"
+            style="width: 100%; height: 100%; border: none;"
+            allow="autoplay">
+          </iframe>
         </div>
       <% end %>
+
+      <table class="table table-bordered">
+        <tbody>
+          <% Application.displayable_columns.each_slice(2) do |left_col, right_col| %>
+            <tr>
+              <% if left_col %>
+                <th class="bg-light" style="width: 20%"><%= left_col.humanize %></th>
+                <td style="width: 30%">
+                  <% if left_col == "resume" && @application.resume.present? %>
+                    <%= link_to @application.resume, @application.resume, target: "_blank" %>
+                  <% else %>
+                    <%= @application.send(left_col) %>
+                  <% end %>
+                </td>
+              <% end %>
+              
+              <% if right_col %>
+                <th class="bg-light" style="width: 20%"><%= right_col.humanize %></th>
+                <td style="width: 30%">
+                  <% if right_col == "resume" && @application.resume.present? %>
+                    <%= link_to @application.resume, @application.resume, target: "_blank" %>
+                  <% else %>
+                    <%= @application.send(right_col) %>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
 
       <% if @application.initial_reviews.any? %>
         <div class="mt-4">
@@ -58,4 +59,6 @@
       <% end %>
     </div>
   </div>
+
+  <%= render 'review_buttons', application: @application %>
 </div> 
