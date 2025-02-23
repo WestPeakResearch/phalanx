@@ -23,33 +23,6 @@
         <div class="grid-cell">
           <% if application.resume.present? %>
             <%= link_to "View Resume", application.resume, target: "_blank", class: "btn btn-sm btn-secondary" %>
-            <button 
-              class="btn btn-sm btn-primary" 
-              data-bs-toggle="modal" 
-              data-bs-target="#resumeModal<%= application.id %>">
-              Preview
-            </button>
-
-            <!-- Modal -->
-            <div class="modal fade" id="resumeModal<%= application.id %>" tabindex="-1">
-              <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title">
-                      Resume - <%= application.first_name %> <%= application.last_name %>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                  </div>
-                  <div class="modal-body">
-                    <iframe 
-                      src="https://drive.google.com/file/d/<%= application.resume.split('id=').last %>/preview"
-                      style="width: 100%; height: 600px; border: none;"
-                      allow="autoplay">
-                    </iframe>
-                  </div>
-                </div>
-              </div>
-            </div>
           <% end %>
         </div>
         <div class="grid-cell">

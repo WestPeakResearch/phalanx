@@ -44,7 +44,7 @@ class DocumentsController < ApplicationController
       graudation_year = row[8]&.value.to_s
       position = row[9]&.value.to_s
       resume = row[10]&.value.to_s
-      #additional_info = row[11] ? row[11].value : ""
+      additional_info = row[11]&.value.to_s
       origin = row[12]&.value.to_s
       preference = row[13]&.value.to_s
       location = row[14]&.value.to_s
@@ -62,10 +62,11 @@ class DocumentsController < ApplicationController
         grad_year: graudation_year,
         position: position,
         resume: resume,
+        additional: additional_info,
         source: origin,
         group_preference: preference,
         countries: location,
-        careers: careers
+        careers: careers,
       )
     end
   end

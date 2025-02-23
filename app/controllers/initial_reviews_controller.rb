@@ -16,11 +16,6 @@ class InitialReviewsController < ApplicationController
       .first
 
     if application
-      # Create pending review immediately
-      application.initial_reviews.create!(
-        decision: :pending,
-        reviewer: "TEMP_USER",
-      )
       redirect_to review_application_path(application)
     else
       render :all_reviewed
@@ -32,8 +27,24 @@ class InitialReviewsController < ApplicationController
     @pending_review = @application.initial_reviews.find_by(reviewer: "TEMP_USER", decision: :pending)
 
     unless @pending_review
-      redirect_to initial_reviews_path, alert: "No pending review found"
+      redirect_to create_pending_initial_review_path(@application, from_index: params[:from_index])
     end
+  end
+
+  def create_pending
+    @application = Application.includes(:initial_reviews).find(params[:id])
+    @pending_review = @application.initial_reviews.create!(
+      decision: :pending,
+      reviewer: "TEMP_USER",
+    )
+    # Broadcast the update after creating pending review
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "applications",
+      target: "application_#{@application.id}",
+      partial: "initial_reviews/application_row",
+      locals: { application: @application },
+    )
+    redirect_to review_application_path(@application, from_index: params[:from_index])
   end
 
   def submit
@@ -46,22 +57,34 @@ class InitialReviewsController < ApplicationController
     end
 
     if params[:skip]
-      review.destroy
-      # Broadcast the update after destroying
-      Turbo::StreamsChannel.broadcast_replace_to(
-        "applications",
-        target: "application_#{@application.id}",
-        partial: "initial_reviews/application_row",
-        locals: { application: @application },
-      )
-      redirect_to review_one_initial_reviews_path, notice: "Skipped review"
+      cleanup(@application)
+      recede_or_redirect_to initial_reviews_path, notice: "Skipped review"
     else
       if review.update(decision: params[:decision])
         # The after_commit callback will handle the broadcast
-        redirect_to review_one_initial_reviews_path, notice: "Review submitted successfully"
+        if params[:from_index]
+          recede_or_redirect_to initial_reviews_path, notice: "Review submitted successfully"
+        else
+          redirect_to review_one_initial_reviews_path, notice: "Review submitted successfully"
+        end
       else
         redirect_to review_application_path(@application), alert: "Error submitting review"
       end
+    end
+  end
+
+  def cleanup(application)
+    pending_review = application.initial_reviews.find_by(reviewer: "TEMP_USER", decision: :pending)
+
+    if pending_review
+      pending_review.destroy
+      # Broadcast the update after destroying
+      Turbo::StreamsChannel.broadcast_replace_to(
+        "applications",
+        target: "application_#{application.id}",
+        partial: "initial_reviews/application_row",
+        locals: { application: application },
+      )
     end
   end
 end

@@ -7,11 +7,11 @@
 }
 
 .reviews-grid {
-  grid-template-columns: 1fr 1fr 3fr 1fr;
+  grid-template-columns: 1fr 1fr 3fr 1fr 1fr;
 }
 
 .applications-grid {
-  grid-template-columns: 1fr 1fr 1fr 2fr 1fr 3fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 2fr 1fr 1fr 1fr;
 }
 
 .grid-header {
@@ -30,6 +30,12 @@
 
 .grid-row {
   display: contents;
+}
+
+/* Row highlighting */
+.grid-row-negative > .grid-cell {
+  background-color: #ffebee;  /* Light red background */
+  border-color: #ffcdd2;  /* Slightly darker red border */
 }
 
 /* Review Boxes */
@@ -56,19 +62,36 @@
   background-color: #dc3545;  /* red */
 }
 
-/* Add to your existing CSS */
+/* Review Buttons */
+.review-buttons-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
 .review-buttons {
   display: flex;
   gap: 1rem;
   justify-content: center;
+  margin-bottom: 1.5rem;
 }
 
 .review-buttons .btn {
   padding: 1rem 2rem;
   font-size: 1.2rem;
+  white-space: nowrap;
 }
 
-/* Add to your existing review box styles */
+.back-button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  white-space: nowrap;
+}
+
+/* Add to your existing CSS */
 .review-pending {
   background-color: #6c757d;  /* grey */
 } 

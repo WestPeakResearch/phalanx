@@ -1,4 +1,6 @@
-<div class="container mt-4">
+<div class="container mt-4" 
+     data-controller="review-cleanup"
+     data-application-id="<%= @application.id %>">
   <h1>Review Application</h1>
 
   <%= render 'review_buttons', application: @application %>
@@ -48,13 +50,7 @@
       <% if @application.initial_reviews.any? %>
         <div class="mt-4">
           <h4>Existing Reviews</h4>
-          <div class="review-boxes">
-            <% @application.initial_reviews.each do |review| %>
-              <div class="review-box review-<%= review.decision %>" 
-                   title="Reviewed by <%= review.reviewer %>: <%= review.decision.upcase %>">
-              </div>
-            <% end %>
-          </div>
+          <%= render 'review_boxes', reviews: @application.initial_reviews %>
         </div>
       <% end %>
     </div>

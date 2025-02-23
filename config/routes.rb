@@ -1,10 +1,15 @@
 Rails.application.routes.draw do
+  root "home#index"
+
   resources :applications do
     get "raw", on: :collection, as: "raw"
   end
   resources :initial_reviews, only: [:index] do
     collection do
       get "review_one"  # Route for getting next application to review
+    end
+    member do
+      get "create_pending"  # Route for creating pending review
     end
   end
   get "initial_reviews/review/:id", to: "initial_reviews#review", as: "review_application"

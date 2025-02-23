@@ -1,0 +1,20 @@
+<div class="container mt-4">
+  <h1 class="mb-4">Application Review System</h1>
+
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    <% @stages.each do |stage| %>
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <i class="<%= stage[:icon] %> fa-2x me-3 text-primary"></i>
+              <h5 class="card-title mb-0"><%= stage[:name] %></h5>
+            </div>
+            <p class="card-text"><%= stage[:description] %></p>
+            <%= link_to "Go to #{stage[:name]}", stage[:path], class: "btn btn-primary" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div> 

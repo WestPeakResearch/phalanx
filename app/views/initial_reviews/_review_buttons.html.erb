@@ -1,18 +1,18 @@
 <%# Review buttons partial %>
-<div class="review-buttons mb-4">
-  <%= button_to submit_review_path(application, decision: :yes), 
+<div class="review-buttons">
+  <%= button_to submit_review_path(application, decision: :yes, from_index: params[:from_index]), 
                 method: :post,
                 class: "btn btn-success" do %>
     Accept <i class="fas fa-check"></i>
   <% end %>
 
-  <%= button_to submit_review_path(application, decision: :maybe), 
+  <%= button_to submit_review_path(application, decision: :maybe, from_index: params[:from_index]), 
                 method: :post,
                 class: "btn btn-warning" do %>
     Maybe <i class="fas fa-question"></i>
   <% end %>
 
-  <%= button_to submit_review_path(application, decision: :no), 
+  <%= button_to submit_review_path(application, decision: :no, from_index: params[:from_index]), 
                 method: :post,
                 class: "btn btn-danger" do %>
     Reject <i class="fas fa-times"></i>
@@ -21,6 +21,6 @@
   <%= button_to submit_review_path(application, skip: true), 
                 method: :post,
                 class: "btn btn-secondary" do %>
-    DO NOT REVIEW <i class="fas fa-ban"></i>
+    Back to Index <i class="fas fa-arrow-left"></i>
   <% end %>
 </div> 

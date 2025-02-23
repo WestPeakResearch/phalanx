@@ -1,0 +1,8 @@
+<%# Review boxes partial %>
+<div class="review-boxes">
+  <% reviews.each do |review| %>
+    <div class="review-box review-<%= review.decision %>" 
+         title="Reviewed by <%= review.reviewer %>: <%= review.decision.upcase %>">
+    </div>
+  <% end %>
+</div> 

@@ -1,16 +1,21 @@
-<div class="grid-row" id="application_<%= application.id %>">
+<%
+  has_no = application.initial_reviews.any? { |r| r.no? }
+  has_yes = application.initial_reviews.any? { |r| r.yes? }
+  negative_highlight = has_no && !has_yes ? 'grid-row-negative' : ''
+%>
+<div class="grid-row <%= negative_highlight %>" id="application_<%= application.id %>">
   <div class="grid-cell"><%= application.first_name %></div>
   <div class="grid-cell"><%= application.last_name %></div>
   <div class="grid-cell">
-    <div class="review-boxes">
-      <% application.initial_reviews.each do |review| %>
-        <div class="review-box review-<%= review.decision %>" 
-             title="Reviewed by <%= review.reviewer %>: <%= review.decision.upcase %>">
-        </div>
-      <% end %>
-    </div>
+    <%= render 'initial_reviews/review_boxes', reviews: application.initial_reviews %>
   </div>
   <div class="grid-cell">
     <%= link_to "See Application", application_path(application), class: "btn btn-sm btn-primary" %>
+    <% if application.resume.present? %>
+      <%= link_to "View Resume", application.resume, target: "_blank", class: "btn btn-sm btn-secondary ms-1" %>
+    <% end %>
+  </div>
+  <div class="grid-cell">
+    <%= link_to "Review", create_pending_initial_review_path(application, from_index: true), class: "btn btn-sm btn-success", data: { turbo: false } %>
   </div>
 </div> 
