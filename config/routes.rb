@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  devise_for :users, only: []
+
   root "home#index"
 
   resources :applications do
@@ -16,6 +18,7 @@ Rails.application.routes.draw do
   post "initial_reviews/submit/:id", to: "initial_reviews#submit", as: "submit_review"
   resources :link, only: [:index, :create]
   resources :documents, only: [:new, :create]
+  resources :logins, only: [:show, :new, :create, :destroy]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

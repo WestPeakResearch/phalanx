@@ -1,0 +1,8 @@
+<%= form_with url: logins_path do |f| %>
+  <%= f.label :email %>
+  <%= f.email_field :email,
+                    required: true,
+                    autocomplete: 'email' %>
+
+  <%= f.submit "Send Magic Link" %>
+<% end %>
