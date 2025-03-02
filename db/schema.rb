@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_02_042130) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_02_174127) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -76,6 +76,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_02_042130) do
     t.index ["user_id"], name: "index_initial_reviews_on_user_id"
   end
 
+  create_table "scorings", force: :cascade do |t|
+    t.integer "application_id", null: false
+    t.integer "user_id", null: false
+    t.integer "interest_score"
+    t.integer "alignment_score"
+    t.integer "polish_score"
+    t.integer "overall_score"
+    t.integer "status", default: 0, null: false
+    t.text "comments"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id", "user_id"], name: "index_scorings_on_application_id_and_user_id", unique: true
+    t.index ["application_id"], name: "index_scorings_on_application_id"
+    t.index ["user_id"], name: "index_scorings_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "name", default: "", null: false
@@ -95,4 +111,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_02_042130) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "initial_reviews", "applications"
   add_foreign_key "initial_reviews", "users"
+  add_foreign_key "scorings", "applications"
+  add_foreign_key "scorings", "users"
 end

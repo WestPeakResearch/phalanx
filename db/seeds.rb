@@ -12,5 +12,13 @@ User.create!(
   email: "admin1@westpeakresearch.com",
   name: "Admin 1",
 )
+User.create!(
+  email: "admin2@westpeakresearch.com",
+  name: "Admin 2",
+)
+User.create!(
+  email: "admin3@westpeakresearch.com",
+  name: "Admin 3",
+)
 
 puts "Seeded users"

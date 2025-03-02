@@ -1,8 +1,28 @@
 <div class="container mt-4">
   <h1 class="mb-4">Initial Review Overview</h1>
 
-  <div class="mb-4 text-center">
-    <%= link_to "Start Reviewing", review_one_initial_reviews_path, class: "btn btn-lg btn-success" %>
+  <%
+    # Find applications with pending reviews assigned to the current user
+    pending_reviews = InitialReview.where(user: current_user, decision: :pending)
+    pending_applications_count = pending_reviews.count
+    has_pending_applications = pending_applications_count > 0
+    
+    # Get the first pending application for the review link
+    first_pending_application = pending_reviews.first&.application
+  %>
+
+  <%= turbo_stream_from "user_#{current_user.id}_pending_reviews" %>
+  
+  <div class="text-center mb-4">
+    <div id="review_button_container" style="display: inline-block;">
+      <%= render "review_button", current_user: current_user %>
+    </div>
+    
+    <%= turbo_frame_tag "batch_assign_section" do %>
+      <%= render "batch_assign_section", 
+                applications_needing_reviews: @applications_needing_reviews,
+                total_reviews_needed: @total_reviews_needed %>
+    <% end %>
   </div>
 
   <%= turbo_stream_from "applications" %>

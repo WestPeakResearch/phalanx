@@ -1,8 +1,8 @@
 <%# Review boxes partial %>
 <div class="review-boxes">
-  <% reviews.sort_by { |r| r.user&.email || '' }.each do |review| %>
-    <div class="review-box review-<%= review.decision %>" 
-         title="Reviewed by <%= review.user&.email&.split('@')&.first || 'Unknown' %>: <%= review.decision.upcase %>">
+  <% reviews.sort_by { |r| r.user&.name || '' }.each do |review| %>
+    <div class="review-box review-<%= review.decision %>">
+      <div class="review-name"><%= review.user&.name || 'Unknown' %></div>
     </div>
   <% end %>
 </div> 

@@ -1,0 +1,18 @@
+<%# Score boxes partial %>
+<div class="score-boxes">
+  <% scorings.each do |scoring| %>
+    <% if scoring.completed? %>
+      <% avg_score = scoring.average_score %>
+      <% score_class = avg_score < 3 ? 'low' : (avg_score < 4 ? 'medium' : 'high') %>
+      <div class="score-box score-<%= score_class %>">
+        <div class="score-value"><%= avg_score %></div>
+        <div class="score-name"><%= scoring.user&.name || 'Unknown' %></div>
+      </div>
+    <% else %>
+      <div class="score-box score-pending">
+        <div class="score-value">...</div>
+        <div class="score-name"><%= scoring.user&.name || 'Unknown' %></div>
+      </div>
+    <% end %>
+  <% end %>
+</div> 

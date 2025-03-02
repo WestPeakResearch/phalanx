@@ -1,0 +1,37 @@
+<%
+  sorted_scorings = application.scorings.sort_by { |s| s.user&.name || '' }
+  completed_scorings = sorted_scorings.select(&:completed?)
+  avg_scores = completed_scorings.map(&:average_score).compact
+  avg_score = avg_scores.empty? ? nil : (avg_scores.sum / avg_scores.size).round(1)
+  
+  # Determine if we should highlight the row based on average score
+  highlight_class = ''
+  if avg_score.present?
+    if avg_score < 2.5
+      highlight_class = 'grid-row-negative'
+    elsif avg_score > 4
+      highlight_class = 'grid-row-positive'
+    end
+  end
+%>
+<div class="grid-row <%= highlight_class %>" id="scoring_application_<%= application.id %>">
+  <div class="grid-cell"><%= application.first_name %></div>
+  <div class="grid-cell"><%= application.last_name %></div>
+  <div class="grid-cell">
+    <%= render 'scorings/score_boxes', scorings: sorted_scorings %>
+  </div>
+  <div class="grid-cell">
+    <%= link_to "View", application_path(application), class: "btn btn-sm btn-primary" %>
+    <% if application.resume.present? %>
+      <%= link_to "Resume", application.resume, target: "_blank", class: "btn btn-sm btn-secondary ms-1" %>
+    <% end %>
+  </div>
+  <div class="grid-cell">
+    <% if avg_score.present? %>
+      <span class="badge bg-<%= avg_score < 3 ? 'danger' : (avg_score < 4 ? 'warning' : 'success') %>">
+        <%= avg_score %>/5
+      </span>
+    <% end %>
+    <%= link_to "Score", create_pending_scoring_path(application, from_index: true), class: "btn btn-sm btn-success ms-1", data: { turbo: false } %>
+  </div>
+</div> 

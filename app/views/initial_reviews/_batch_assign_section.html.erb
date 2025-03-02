@@ -1,0 +1,12 @@
+<% if applications_needing_reviews.any? %>
+  <div class="alert alert-warning mt-3">
+    <strong>Reviews Needed:</strong> 
+    <%= applications_needing_reviews.size %> <%= 'application'.pluralize(applications_needing_reviews.size) %> 
+    <%= applications_needing_reviews.size == 1 ? 'needs' : 'need' %> 
+    <%= total_reviews_needed %> more <%= 'review'.pluralize(total_reviews_needed) %> to be assigned
+  </div>
+  
+  <div class="mt-2">
+    <%= link_to "Batch Assign Reviews", assign_initial_reviews_path, class: "btn btn-primary" %>
+  </div>
+<% end %> 

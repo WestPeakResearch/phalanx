@@ -20,6 +20,12 @@
 
   <%= button_to submit_review_path(application, skip: true), 
                 method: :post,
+                class: "btn btn-outline-danger" do %>
+    Remove assigned review <i class="fas fa-trash"></i>
+  <% end %>
+
+  <%= button_to submit_review_path(application), 
+                method: :post,
                 class: "btn btn-secondary" do %>
     Back to Index <i class="fas fa-arrow-left"></i>
   <% end %>

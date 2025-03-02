@@ -9,13 +9,24 @@ Rails.application.routes.draw do
   resources :initial_reviews, only: [:index] do
     collection do
       get "review_one"  # Route for getting next application to review
-    end
-    member do
-      get "create_pending"  # Route for creating pending review
+      get "assign"      # Route for batch assigning reviews
+      post "assign"     # Route for processing batch assignments
     end
   end
   get "initial_reviews/review/:id", to: "initial_reviews#review", as: "review_application"
+  get "initial_reviews/create_pending/:id", to: "initial_reviews#create_pending", as: "create_pending_initial_review"
   post "initial_reviews/submit/:id", to: "initial_reviews#submit", as: "submit_review"
+
+  # Scoring routes
+  resources :scorings, only: [:index] do
+    collection do
+      get "review_one"  # Route for getting next application to score
+    end
+  end
+  get "scorings/review/:id", to: "scorings#review", as: "review_scoring"
+  get "scorings/create_pending/:id", to: "scorings#create_pending", as: "create_pending_scoring"
+  post "scorings/submit/:id", to: "scorings#submit", as: "submit_scoring"
+
   resources :link, only: [:index, :create]
   resources :documents, only: [:new, :create, :destroy] do
     get :export, on: :collection

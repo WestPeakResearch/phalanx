@@ -1,0 +1,5 @@
+<%= turbo_stream.update "batch_assign_section" do %>
+  <%= render "batch_assign_section",
+            applications_needing_reviews: @applications_needing_reviews,
+            total_reviews_needed: @total_reviews_needed %>
+<% end %> 

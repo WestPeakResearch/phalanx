@@ -1,5 +1,5 @@
 <%
-  sorted_reviews = application.initial_reviews.sort_by { |r| r.user&.email&.split('@')&.first || '' }
+  sorted_reviews = application.initial_reviews.sort_by { |r| r.user&.name || '' }
   has_no = sorted_reviews.any? { |r| r.no? }
   has_yes = sorted_reviews.any? { |r| r.yes? }
   negative_highlight = has_no && !has_yes ? 'grid-row-negative' : ''

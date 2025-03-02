@@ -1,5 +1,6 @@
 class Application < ApplicationRecord
   has_many :initial_reviews, dependent: :destroy
+  has_many :scorings, dependent: :destroy
 
   def self.displayable_columns
     # Exclude common Rails columns that usually don't need to be displayed

@@ -1,0 +1,19 @@
+<%
+  # Find applications with pending reviews assigned to the current user
+  pending_reviews = InitialReview.where(user: current_user, decision: :pending)
+  pending_applications_count = pending_reviews.count
+  has_pending_applications = pending_applications_count > 0
+  
+  # Get the first pending application for the review link
+  first_pending_application = pending_reviews.first&.application
+%>
+
+<% if has_pending_applications %>
+  <%= link_to "Review assigned applications (#{pending_applications_count})", 
+              review_application_path(first_pending_application), 
+              class: "btn btn-lg btn-success d-inline-block" %>
+<% else %>
+  <button class="btn btn-lg btn-secondary d-inline-block" disabled>
+    Review assigned applications (0)
+  </button>
+<% end %> 

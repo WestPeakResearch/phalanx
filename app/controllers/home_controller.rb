@@ -19,6 +19,12 @@ class HomeController < ApplicationController
         path: initial_reviews_path,
         icon: "rate_review",
       },
+      {
+        name: "Scoring",
+        description: "Score applications based on detailed criteria",
+        path: scorings_path,
+        icon: "grade",
+      },
     ]
   end
 end

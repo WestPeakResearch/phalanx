@@ -1,0 +1,71 @@
+<div class="container mt-4">
+  <h1 class="mb-4">Application Scoring Overview</h1>
+
+  <%
+    # Filter applications that have passed the initial review
+    # An application passes if it doesn't have at least one negative review with no positive reviews
+    all_applications = @applications
+    failed_applications = all_applications.select do |app|
+      reviews = app.initial_reviews
+      has_no = reviews.any? { |r| r.no? }
+      has_yes = reviews.any? { |r| r.yes? }
+      has_no && !has_yes
+    end
+    
+    passed_applications = all_applications - failed_applications
+    total_count = all_applications.size
+    failed_count = failed_applications.size
+    passed_count = passed_applications.size
+
+    # Check if initial review is completed
+    # Initial review is completed when all applications have at least 2 completed (non-pending) initial_reviews
+    applications_with_incomplete_reviews = all_applications.select do |app|
+      completed_reviews = app.initial_reviews.reject(&:pending?)
+      completed_reviews.size < 2
+    end
+    
+    initial_review_completed = applications_with_incomplete_reviews.empty?
+  %>
+
+  <% unless initial_review_completed %>
+    <div class="alert alert-danger mb-4">
+      <strong>⚠️ Critical Warning:</strong> Initial review is not completed!
+      <p class="mb-0">
+        <%= applications_with_incomplete_reviews.size %> applications still need at least 2 completed initial reviews.
+        <%= link_to "Go to Initial Reviews", initial_reviews_path, class: "alert-link" %>
+      </p>
+    </div>
+  <% end %>
+
+  <div class="alert alert-info mb-4">
+    <strong>Application Statistics:</strong>
+    <ul class="mb-0">
+      <li>Total Applications: <%= total_count %></li>
+      <li>Failed Initial Review: <%= failed_count %> (<%= (failed_count.to_f / total_count * 100).round(1) %>%)</li>
+      <li>Passed to Scoring Round: <%= passed_count %> (<%= (passed_count.to_f / total_count * 100).round(1) %>%)</li>
+    </ul>
+  </div>
+
+  <div class="mb-4 text-center">
+    <%= link_to "Start Scoring", review_one_scorings_path, class: "btn btn-lg btn-success" %>
+  </div>
+
+  <%= turbo_stream_from "scoring_applications" %>
+
+  <% passed_applications.group_by(&:year).sort.each do |year, applications| %>
+    <h2 class="year-header">Year <%= year %></h2>
+    <div class="reviews-grid">
+      <%# Headers %>
+      <div class="grid-header">First Name</div>
+      <div class="grid-header">Last Name</div>
+      <div class="grid-header">Scoring Status</div>
+      <div class="grid-header">Actions</div>
+      <div class="grid-header">Score</div>
+
+      <%# Rows - applications are already sorted by last_name, first_name from the controller %>
+      <% applications.each do |application| %>
+        <%= render "application_row", application: application %>
+      <% end %>
+    </div>
+  <% end %>
+</div> 

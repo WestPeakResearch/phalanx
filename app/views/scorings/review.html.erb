@@ -1,0 +1,114 @@
+<div class="container mt-4" 
+     data-controller="review-cleanup"
+     data-application-id="<%= @application.id %>">
+  <h1>Score Application</h1>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <% if @application.resume.present? %>
+        <div class="resume-preview mb-4" style="width: 100%; height: 600px;">
+          <iframe 
+            src="https://drive.google.com/file/d/<%= @application.resume.split('id=').last %>/preview"
+            style="width: 100%; height: 100%; border: none;"
+            allow="autoplay">
+          </iframe>
+        </div>
+      <% end %>
+
+      <table class="table table-bordered">
+        <tbody>
+          <% Application.displayable_columns.each_slice(2) do |left_col, right_col| %>
+            <tr>
+              <% if left_col %>
+                <th class="bg-light" style="width: 20%"><%= left_col.humanize %></th>
+                <td style="width: 30%">
+                  <% if left_col == "resume" && @application.resume.present? %>
+                    <%= link_to @application.resume, @application.resume, target: "_blank" %>
+                  <% else %>
+                    <%= @application.send(left_col) %>
+                  <% end %>
+                </td>
+              <% end %>
+              
+              <% if right_col %>
+                <th class="bg-light" style="width: 20%"><%= right_col.humanize %></th>
+                <td style="width: 30%">
+                  <% if right_col == "resume" && @application.resume.present? %>
+                    <%= link_to @application.resume, @application.resume, target: "_blank" %>
+                  <% else %>
+                    <%= @application.send(right_col) %>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <% if @application.scorings.completed.any? %>
+        <div class="mt-4">
+          <h4>Existing Scores</h4>
+          <%= render 'score_boxes', scorings: @application.scorings.completed.sort_by { |s| s.user&.name || '' } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= form_with url: submit_scoring_path(@application, from_index: params[:from_index]), method: :post, class: "scoring-form" do |form| %>
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h3 class="mb-0">Scoring Rubric</h3>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <div class="form-group">
+              <%= form.label :interest_score, "Interest (1-5)" %>
+              <%= form.select :interest_score, options_for_select((1..5).map { |n| [n, n] }), { include_blank: "Select..." }, class: "form-select" %>
+              <small class="form-text text-muted">
+                1: No interest in the organization<br>
+                3: Moderate interest in the organization<br>
+                5: Strong passion for the organization
+              </small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <%= form.label :alignment_score, "Alignment (1-5)" %>
+              <%= form.select :alignment_score, options_for_select((1..5).map { |n| [n, n] }), { include_blank: "Select..." }, class: "form-select" %>
+              <small class="form-text text-muted">
+                1: Not aligned with organization's values<br>
+                3: Somewhat aligned with organization's values<br>
+                5: Perfectly aligned with organization's values
+              </small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <%= form.label :polish_score, "Polish (1-5)" %>
+              <%= form.select :polish_score, options_for_select((1..5).map { |n| [n, n] }), { include_blank: "Select..." }, class: "form-select" %>
+              <small class="form-text text-muted">
+                1: Poor presentation, many errors<br>
+                3: Adequate presentation, few errors<br>
+                5: Exceptional presentation, no errors
+              </small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <%= form.label :comments, "Comments" %>
+          <%= form.text_area :comments, class: "form-control", rows: 4 %>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-4">
+      <%= form.submit "Submit Scoring", class: "btn btn-lg btn-success" %>
+    </div>
+  <% end %>
+  
+  <%= button_to submit_scoring_path(@application, skip: true, from_index: params[:from_index]), method: :post, class: "btn btn-lg btn-secondary", style: "margin-top: -70px; float: right;" do %>
+    Back to Index <i class="fas fa-arrow-left"></i>
+  <% end %>
+</div> 
