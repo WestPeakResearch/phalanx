@@ -18,7 +18,11 @@ Rails.application.routes.draw do
   post "initial_reviews/submit/:id", to: "initial_reviews#submit", as: "submit_review"
   resources :link, only: [:index, :create]
   resources :documents, only: [:new, :create]
-  resources :logins, only: [:show, :new, :create, :destroy]
+
+  # Login routes
+  resources :logins, only: [:new, :create, :destroy]
+  get "logins", to: "logins#show", as: "login_with_token"  # For handling ?token=xyz
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

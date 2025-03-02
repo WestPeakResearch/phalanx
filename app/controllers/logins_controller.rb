@@ -1,4 +1,6 @@
 class LoginsController < ApplicationController
+  skip_before_action :authenticate_user!, only: [:new, :create, :show]
+
   def new
   end
 
@@ -7,7 +9,7 @@ class LoginsController < ApplicationController
 
     if user.present?
       token = user.generate_token_for(:magic_login)
-      puts "url: #{logins_url(token: token)}"
+      puts "url: #{login_with_token_url(token: token)}"
     end
 
     redirect_to new_login_path, notice: "Magic link sent"
@@ -21,9 +23,7 @@ class LoginsController < ApplicationController
 
       redirect_to root_path, notice: "Signed in"
     else
-      flash[:alert] = "Cannot authenticate"
-
-      redirect_to new_login_path
+      redirect_to new_login_path, flash: { alert: "Cannot authenticate" }
     end
   end
 
