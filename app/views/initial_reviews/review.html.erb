@@ -50,7 +50,7 @@
       <% if @application.initial_reviews.any? %>
         <div class="mt-4">
           <h4>Existing Reviews</h4>
-          <%= render 'review_boxes', reviews: @application.initial_reviews %>
+          <%= render 'review_boxes', reviews: @application.initial_reviews.sort_by { |r| r.user&.email&.split('@')&.first || '' } %>
         </div>
       <% end %>
     </div>

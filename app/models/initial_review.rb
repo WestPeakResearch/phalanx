@@ -1,5 +1,6 @@
 class InitialReview < ApplicationRecord
   belongs_to :application
+  belongs_to :user
   broadcasts_to :application, inserts_by: :prepend
 
   # Enum for the review decision (no: 0, maybe: 1, yes: 2, pending: 3)
@@ -7,7 +8,7 @@ class InitialReview < ApplicationRecord
 
   # Validations
   validates :decision, presence: true
-  validates :reviewer, presence: true
+  validates :user_id, presence: true
   validates :application_id, presence: true
 
   after_commit :broadcast_application_update

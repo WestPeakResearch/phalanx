@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_24_031734) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_02_042130) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -69,10 +69,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_24_031734) do
   create_table "initial_reviews", force: :cascade do |t|
     t.integer "application_id", null: false
     t.integer "decision"
-    t.string "reviewer"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["application_id"], name: "index_initial_reviews_on_application_id"
+    t.index ["user_id"], name: "index_initial_reviews_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -93,4 +94,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_24_031734) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "initial_reviews", "applications"
+  add_foreign_key "initial_reviews", "users"
 end

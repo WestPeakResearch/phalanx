@@ -2,7 +2,7 @@ class InitialReviewsController < ApplicationController
   def index
     @applications = Application.includes(:initial_reviews)
       .where.not(year: nil)
-      .order(:year)
+      .order(:last_name, :first_name) # Sort alphabetically by last name, then first name
       .to_a  # Force evaluation of the query
   end
 
@@ -24,7 +24,7 @@ class InitialReviewsController < ApplicationController
 
   def review
     @application = Application.includes(:initial_reviews).find(params[:id])
-    @pending_review = @application.initial_reviews.find_by(reviewer: "TEMP_USER", decision: :pending)
+    @pending_review = @application.initial_reviews.find_by(user: current_user, decision: :pending)
 
     unless @pending_review
       redirect_to create_pending_initial_review_path(@application, from_index: params[:from_index])
@@ -35,7 +35,7 @@ class InitialReviewsController < ApplicationController
     @application = Application.includes(:initial_reviews).find(params[:id])
     @pending_review = @application.initial_reviews.create!(
       decision: :pending,
-      reviewer: "TEMP_USER",
+      user: current_user,
     )
     # Broadcast the update after creating pending review
     Turbo::StreamsChannel.broadcast_replace_to(
@@ -49,7 +49,7 @@ class InitialReviewsController < ApplicationController
 
   def submit
     @application = Application.find(params[:id])
-    review = @application.initial_reviews.find_by(reviewer: "TEMP_USER", decision: :pending)
+    review = @application.initial_reviews.find_by(user: current_user, decision: :pending)
 
     unless review
       redirect_to initial_reviews_path, alert: "No pending review found"
@@ -74,7 +74,7 @@ class InitialReviewsController < ApplicationController
   end
 
   def cleanup(application)
-    pending_review = application.initial_reviews.find_by(reviewer: "TEMP_USER", decision: :pending)
+    pending_review = application.initial_reviews.find_by(user: current_user, decision: :pending)
 
     if pending_review
       pending_review.destroy

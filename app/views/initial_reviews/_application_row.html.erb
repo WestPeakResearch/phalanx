@@ -1,18 +1,19 @@
 <%
-  has_no = application.initial_reviews.any? { |r| r.no? }
-  has_yes = application.initial_reviews.any? { |r| r.yes? }
+  sorted_reviews = application.initial_reviews.sort_by { |r| r.user&.email&.split('@')&.first || '' }
+  has_no = sorted_reviews.any? { |r| r.no? }
+  has_yes = sorted_reviews.any? { |r| r.yes? }
   negative_highlight = has_no && !has_yes ? 'grid-row-negative' : ''
 %>
 <div class="grid-row <%= negative_highlight %>" id="application_<%= application.id %>">
   <div class="grid-cell"><%= application.first_name %></div>
   <div class="grid-cell"><%= application.last_name %></div>
   <div class="grid-cell">
-    <%= render 'initial_reviews/review_boxes', reviews: application.initial_reviews %>
+    <%= render 'initial_reviews/review_boxes', reviews: sorted_reviews %>
   </div>
   <div class="grid-cell">
-    <%= link_to "See Application", application_path(application), class: "btn btn-sm btn-primary" %>
+    <%= link_to "View", application_path(application), class: "btn btn-sm btn-primary" %>
     <% if application.resume.present? %>
-      <%= link_to "View Resume", application.resume, target: "_blank", class: "btn btn-sm btn-secondary ms-1" %>
+      <%= link_to "Resume", application.resume, target: "_blank", class: "btn btn-sm btn-secondary ms-1" %>
     <% end %>
   </div>
   <div class="grid-cell">

@@ -1,37 +1,70 @@
-<h1>Applications</h1>
+<div class="container mt-4">
+  <h1 class="mb-4">Applications</h1>
 
-<% @applications.group_by(&:year).sort.each do |year, applications| %>
-  <h2>Year <%= year %></h2>
-  <div class="applications-grid mb-4">
-    <%# Headers %>
-    <div class="grid-header">First Name</div>
-    <div class="grid-header">Last Name</div>
-    <div class="grid-header">Faculty</div>
-    <div class="grid-header">Major</div>
-    <div class="grid-header">Grad Year</div>
-    <div class="grid-header">Resume</div>
-    <div class="grid-header">Actions</div>
+  <% @applications.group_by(&:year).sort.each do |year, applications| %>
+    <h2 class="year-header">Year <%= year %></h2>
+    <div class="applications-grid">
+      <%# Headers %>
+      <div class="grid-header">First Name</div>
+      <div class="grid-header">Last Name</div>
+      <div class="grid-header">Faculty</div>
+      <div class="grid-header">Major</div>
+      <div class="grid-header">Grad Year</div>
+      <div class="grid-header">Resume</div>
+      <div class="grid-header">Actions</div>
+      <div class="grid-header">Delete</div>
 
-    <%# Rows %>
-    <% applications.each do |application| %>
-      <div class="grid-row">
-        <div class="grid-cell"><%= application.first_name %></div>
-        <div class="grid-cell"><%= application.last_name %></div>
-        <div class="grid-cell"><%= application.faculty %></div>
-        <div class="grid-cell"><%= application.major %></div>
-        <div class="grid-cell"><%= application.grad_year %></div>
-        <div class="grid-cell">
-          <% if application.resume.present? %>
-            <%= link_to "View Resume", application.resume, target: "_blank", class: "btn btn-sm btn-secondary" %>
-          <% end %>
+      <%# Rows - applications are already sorted by last_name, first_name from the controller %>
+      <% applications.each do |application| %>
+        <% is_duplicate = @duplicate_ids.include?(application.id) %>
+        <div class="grid-row <%= 'grid-row-duplicate' if is_duplicate %>">
+          <div class="grid-cell"><%= application.first_name %></div>
+          <div class="grid-cell"><%= application.last_name %></div>
+          <div class="grid-cell"><%= application.faculty %></div>
+          <div class="grid-cell"><%= application.major %></div>
+          <div class="grid-cell"><%= application.grad_year %></div>
+          <div class="grid-cell">
+            <% if application.resume.present? %>
+              <%= link_to "View Resume", application.resume, target: "_blank", class: "btn btn-sm btn-secondary" %>
+            <% end %>
+          </div>
+          <div class="grid-cell">
+            <%= link_to "View", application_path(application), class: "btn btn-sm btn-primary" %>
+          </div>
+          <div class="grid-cell">
+            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<%= application.id %>">
+              Delete
+            </button>
+            
+            <!-- Delete Confirmation Modal -->
+            <div class="modal fade" id="deleteModal<%= application.id %>" tabindex="-1" aria-labelledby="deleteModalLabel<%= application.id %>" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel<%= application.id %>">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to delete the application for <strong><%= application.first_name %> <%= application.last_name %></strong>? This action cannot be undone.
+                    <% if is_duplicate %>
+                      <div class="alert alert-warning mt-2">
+                        <strong>Note:</strong> This appears to be a duplicate application.
+                      </div>
+                    <% end %>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <%= link_to "Delete", application_path(application), method: :delete, class: "btn btn-danger", data: { turbo_method: :delete } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="grid-cell">
-          <%= link_to "View Application", application_path(application), class: "btn btn-sm btn-primary" %>
-        </div>
-      </div>
-    <% end %>
-  </div>
-<% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
 
 <%# Keep the Select2 initialization %>
 <% content_for :head do %>

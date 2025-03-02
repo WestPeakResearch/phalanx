@@ -1,36 +1,81 @@
-<h1>Raw Applications Data</h1>
+<div class="container mt-4">
+  <h1 class="mb-4">Raw Applications Data</h1>
 
-<div class="column-picker mb-3">
-  <%= form_tag raw_applications_path, method: :get do %>
-    <label for="visible_columns">Select columns to display:</label>
-    <%= select_tag 'visible_columns[]',
-        options_for_select(Application.displayable_columns, params[:visible_columns] || Application.default_visible_columns),
-        multiple: true,
-        class: 'form-control',
-        data: { controller: 'select' } %>
-    <%= submit_tag 'Update View', class: 'btn btn-primary mt-2' %>
-  <% end %>
-</div>
-
-<div id="applications">
-  <table class="table">
-    <thead>
-      <tr>
-        <% (params[:visible_columns] || Application.default_visible_columns).each do |column_name| %>
-          <th><%= column_name.humanize %></th>
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="column-picker mb-3">
+        <%= form_tag raw_applications_path, method: :get do %>
+          <label for="visible_columns" class="form-label fw-bold">Select columns to display:</label>
+          <%= select_tag 'visible_columns[]',
+              options_for_select(Application.displayable_columns, params[:visible_columns] || Application.default_visible_columns),
+              multiple: true,
+              class: 'form-control',
+              data: { controller: 'select' } %>
+          <%= submit_tag 'Update View', class: 'btn btn-primary mt-2' %>
         <% end %>
-      </tr>
-    </thead>
-    <tbody>
-      <% @applications.each do |application| %>
-        <tr>
-          <% (params[:visible_columns] || Application.default_visible_columns).each do |column_name| %>
-            <td><%= application.send(column_name) %></td>
-          <% end %>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="applications" class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+          <thead class="table-light">
+            <tr>
+              <% (params[:visible_columns] || Application.default_visible_columns).each do |column_name| %>
+                <th class="px-3 py-3"><%= column_name.humanize %></th>
+              <% end %>
+              <th class="px-3 py-3">Actions</th>
+              <th class="px-3 py-3">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @applications.each do |application| %>
+              <% is_duplicate = @duplicate_ids.include?(application.id) %>
+              <tr class="<%= 'table-danger' if is_duplicate %>">
+                <% (params[:visible_columns] || Application.default_visible_columns).each do |column_name| %>
+                  <td class="px-3 py-2"><%= application.send(column_name) %></td>
+                <% end %>
+                <td class="px-3 py-2">
+                  <%= link_to "View", application_path(application), class: "btn btn-sm btn-primary" %>
+                </td>
+                <td class="px-3 py-2">
+                  <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModalRaw<%= application.id %>">
+                    Delete
+                  </button>
+                  
+                  <!-- Delete Confirmation Modal -->
+                  <div class="modal fade" id="deleteModalRaw<%= application.id %>" tabindex="-1" aria-labelledby="deleteModalRawLabel<%= application.id %>" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="deleteModalRawLabel<%= application.id %>">Confirm Deletion</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure you want to delete the application for <strong><%= application.first_name %> <%= application.last_name %></strong>? This action cannot be undone.
+                          <% if is_duplicate %>
+                            <div class="alert alert-warning mt-2">
+                              <strong>Note:</strong> This appears to be a duplicate application.
+                            </div>
+                          <% end %>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          <%= link_to "Delete", application_path(application), method: :delete, class: "btn btn-danger", data: { turbo_method: :delete } %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 <%# Keep the Select2 initialization %>

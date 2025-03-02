@@ -1,6 +1,104 @@
-<%= form_with(model: @document, local: true) do |form| %>
-  <%= form.label :file, "Upload Excel File" %>
-  <%= form.file_field :file %>
+<div class="container mt-4">
+  <h1 class="mb-4">Documents</h1>
+  
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Upload Excel Files</h5>
+      <p class="card-text">
+        Upload Excel files containing applicant information to be imported into the database.
+        The file should contain columns for applicant details such as name, email, student number, etc.
+      </p>
+      
+      <%= form_with(model: @document, local: true, class: "mt-3") do |form| %>
+        <div class="mb-3">
+          <%= form.label :file, "Select Excel File", class: "form-label" %>
+          <%= form.file_field :file, class: "form-control", accept: ".xlsx, .xls" %>
+          <div class="form-text">Supported formats: .xlsx, .xls</div>
+        </div>
+        
+        <%= form.submit "Upload and Process", class: "btn btn-primary" %>
+        <%= link_to "Back to Home", root_path, class: "btn btn-outline-secondary ms-2" %>
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="card mb-4">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0">Export Applications</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text">
+        Export all applications data to an Excel file for further analysis or reporting.
+        The export includes all application details and their associated reviews.
+      </p>
+      <%= link_to export_documents_path, class: "btn btn-success" do %>
+        <span class="material-icons align-middle me-1" style="font-size: 1.2rem;">download</span>
+        Export All Applications
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Expected File Format</h5>
+    </div>
+    <div class="card-body">
+      <p>Your Excel file should have the following columns:</p>
+      <ul>
+        <li>Timestamp</li>
+        <li>Email</li>
+        <li>First Name</li>
+        <li>Last Name</li>
+        <li>Student Number</li>
+        <li>Faculty</li>
+        <li>Major</li>
+        <li>Year</li>
+        <li>Graduation Year</li>
+        <li>Position</li>
+        <li>Resume</li>
+        <li>Additional Information</li>
+        <li>Origin</li>
+        <li>Preference</li>
+        <li>Location</li>
+        <li>Careers</li>
+      </ul>
+      <p class="text-muted">Note: The first 4 rows will be skipped (assumed to be headers).</p>
+    </div>
+  </div>
+  
+  <div class="card mt-4 border-danger">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0">Danger Zone</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text">
+        <strong>Warning:</strong> The following action will permanently delete all application data from the database.
+      </p>
+      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#resetConfirmModal">
+        <span class="material-icons align-middle me-1" style="font-size: 1.2rem;">delete_forever</span>
+        Reset All Applications
+      </button>
+    </div>
+  </div>
+</div>
 
-  <%= form.submit "Upload" %>
-<% end %>
+<!-- Reset Confirmation Modal -->
+<div class="modal fade" id="resetConfirmModal" tabindex="-1" aria-labelledby="resetConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="resetConfirmModalLabel">Confirm Reset</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2"><strong>Warning: This action cannot be undone!</strong></p>
+        <p>You are about to delete ALL applications from the database. This will permanently erase all application data.</p>
+        <p>Are you absolutely sure you want to proceed?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <%= link_to "Yes, Reset All Applications", document_path(0, reset_all: true), class: "btn btn-danger", data: { turbo_method: :delete } %>
+      </div>
+    </div>
+  </div>
+</div>

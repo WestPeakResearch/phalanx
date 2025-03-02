@@ -17,7 +17,9 @@ Rails.application.routes.draw do
   get "initial_reviews/review/:id", to: "initial_reviews#review", as: "review_application"
   post "initial_reviews/submit/:id", to: "initial_reviews#submit", as: "submit_review"
   resources :link, only: [:index, :create]
-  resources :documents, only: [:new, :create]
+  resources :documents, only: [:new, :create, :destroy] do
+    get :export, on: :collection
+  end
 
   # Login routes
   resources :logins, only: [:new, :create, :destroy]
