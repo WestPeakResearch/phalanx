@@ -38,18 +38,29 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        width: auto;
+        pointer-events: none; /* Allow clicking through the container */
       }
       
-      .toast {
-        min-width: 200px;
+      .toast-message {
+        min-width: 250px;
         max-width: 80vw;
         width: auto;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        text-align: center;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        animation: fadeInOut 3s forwards;
+        pointer-events: auto; /* Make the messages clickable */
+        font-weight: 500;
       }
       
-      .toast-body {
-        padding: 0.75rem 1.25rem;
-        border-radius: 0.25rem;
-        text-align: center;
+      @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateY(20px); }
+        10% { opacity: 1; transform: translateY(0); }
+        90% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-20px); }
       }
     </style>
   </head>
@@ -69,10 +80,8 @@
     
     <div class="toast-container">
       <% flash.each do |type, message| %>
-        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-          <div class="toast-body <%= bootstrap_class_for(type) %> text-white">
-            <%= message %>
-          </div>
+        <div class="toast-message <%= bootstrap_class_for(type) %> text-white">
+          <%= message %>
         </div>
       <% end %>
     </div>
@@ -95,15 +104,13 @@
     
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        const toasts = document.querySelectorAll('.toast');
-        toasts.forEach(function(toast) {
-          const bsToast = new bootstrap.Toast(toast, {
-            autohide: true,
-            delay: 3000
-          });
-          
-          bsToast.show();
-        });
+        // Remove toast messages after animation completes
+        setTimeout(function() {
+          const toastContainer = document.querySelector('.toast-container');
+          if (toastContainer) {
+            toastContainer.innerHTML = '';
+          }
+        }, 5000);
       });
     </script>
   </body>
