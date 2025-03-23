@@ -1,6 +1,12 @@
 <div class="container mt-4" 
      data-controller="review-cleanup"
      data-application-id="<%= @application.id %>">
+  <% if @is_editing %>
+    <div class="alert alert-info">
+      <i class="bi bi-pencil-square"></i> You are editing your previous scoring for this application.
+    </div>
+  <% end %>
+
   <h1>Score Application</h1>
 
   <div class="card mb-4">
@@ -54,7 +60,7 @@
     </div>
   </div>
 
-  <%= form_with url: submit_scoring_path(@application, from_index: params[:from_index]), method: :post, class: "scoring-form" do |form| %>
+  <%= form_with url: submit_scoring_path(@application, from_index: params[:from_index]), method: :post, class: "scoring-form" do |f| %>
     <div class="card mb-4">
       <div class="card-header bg-primary text-white">
         <h3 class="mb-0">Scoring Rubric</h3>
@@ -63,8 +69,8 @@
         <div class="row mb-3">
           <div class="col-md-4">
             <div class="form-group">
-              <%= form.label :interest_score, "Interest (1-5)" %>
-              <%= form.select :interest_score, options_for_select((1..5).map { |n| [n, n] }), { include_blank: "Select..." }, class: "form-select" %>
+              <%= f.label :interest_score, "Interest (1-5)" %>
+              <%= f.number_field :interest_score, class: "form-control", min: 1, max: 5, required: true, value: @scoring.interest_score %>
               <small class="form-text text-muted">
                 1: No interest in the organization<br>
                 3: Moderate interest in the organization<br>
@@ -74,8 +80,8 @@
           </div>
           <div class="col-md-4">
             <div class="form-group">
-              <%= form.label :alignment_score, "Alignment (1-5)" %>
-              <%= form.select :alignment_score, options_for_select((1..5).map { |n| [n, n] }), { include_blank: "Select..." }, class: "form-select" %>
+              <%= f.label :alignment_score, "Alignment (1-5)" %>
+              <%= f.number_field :alignment_score, class: "form-control", min: 1, max: 5, required: true, value: @scoring.alignment_score %>
               <small class="form-text text-muted">
                 1: Not aligned with organization's values<br>
                 3: Somewhat aligned with organization's values<br>
@@ -85,8 +91,8 @@
           </div>
           <div class="col-md-4">
             <div class="form-group">
-              <%= form.label :polish_score, "Polish (1-5)" %>
-              <%= form.select :polish_score, options_for_select((1..5).map { |n| [n, n] }), { include_blank: "Select..." }, class: "form-select" %>
+              <%= f.label :polish_score, "Polish (1-5)" %>
+              <%= f.number_field :polish_score, class: "form-control", min: 1, max: 5, required: true, value: @scoring.polish_score %>
               <small class="form-text text-muted">
                 1: Poor presentation, many errors<br>
                 3: Adequate presentation, few errors<br>
@@ -97,18 +103,21 @@
         </div>
         
         <div class="form-group">
-          <%= form.label :comments, "Comments" %>
-          <%= form.text_area :comments, class: "form-control", rows: 4 %>
+          <%= f.label :comments, "Comments" %>
+          <%= f.text_area :comments, class: "form-control", rows: 4, value: @scoring.comments %>
         </div>
       </div>
     </div>
 
-    <div class="d-flex justify-content-between mb-4">
-      <%= form.submit "Submit Scoring", class: "btn btn-lg btn-success" %>
+    <div class="d-flex justify-content-between">
+      <div>
+        <%= f.submit @is_editing ? "Update Scoring" : "Submit Scoring", class: "btn btn-primary" %>
+        <%= link_to "Skip", submit_scoring_path(@application, skip: true, from_index: params[:from_index]), 
+            method: :post, 
+            class: "btn btn-outline-secondary ms-2",
+            data: { turbo_method: :post } %>
+      </div>
+      <%= link_to "Back to List", scorings_path, class: "btn btn-link" %>
     </div>
-  <% end %>
-  
-  <%= button_to submit_scoring_path(@application, skip: true, from_index: params[:from_index]), method: :post, class: "btn btn-lg btn-secondary", style: "margin-top: -70px; float: right;" do %>
-    Back to Index <i class="fas fa-arrow-left"></i>
   <% end %>
 </div> 

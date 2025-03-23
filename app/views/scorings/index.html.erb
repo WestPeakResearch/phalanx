@@ -47,7 +47,17 @@
   </div>
 
   <div class="mb-4 text-center">
-    <%= link_to "Start Scoring", review_one_scorings_path, class: "btn btn-lg btn-success" %>
+    <%
+      has_pending_reviews = Scoring.exists?(user: current_user, status: :pending)
+      button_class = "btn btn-lg #{has_pending_reviews ? 'btn-success' : 'btn-secondary'} me-2"
+    %>
+    <%= link_to "Start Scoring", review_one_scorings_path, 
+        class: button_class,
+        disabled: !has_pending_reviews,
+        title: has_pending_reviews ? nil : "No pending reviews assigned to you" %>
+    <button type="button" class="btn btn-lg btn-primary" data-bs-toggle="modal" data-bs-target="#assignReviewersModal">
+      Assign Reviewers
+    </button>
   </div>
 
   <%= turbo_stream_from "scoring_applications" %>
@@ -68,4 +78,47 @@
       <% end %>
     </div>
   <% end %>
+</div>
+
+<!-- Assign Reviewers Modal -->
+<div class="modal fade" id="assignReviewersModal" tabindex="-1" aria-labelledby="assignReviewersModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="assignReviewersModalLabel">Assign Reviewers to Year Levels</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <%= form_with url: assign_reviewers_scorings_path, method: :post do |f| %>
+        <div class="modal-body">
+          <div class="alert alert-info">
+            <p><strong>Assignment Rules:</strong></p>
+            <ul class="mb-0">
+              <li>Years 4 and 5 will be grouped together</li>
+              <li>Each year level will be assigned at least 2 reviewers</li>
+              <li>Reviewers will be assigned in alphabetical order by name</li>
+              <li>A reviewer can be assigned to multiple year levels</li>
+              <li>A reviewer cannot be assigned to the same year level twice</li>
+              <li>Assignment continues until all selected reviewers are assigned</li>
+            </ul>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"><strong>Select Available Reviewers:</strong></label>
+            <div class="reviewer-checkboxes">
+              <% User.all.order(:name).each do |user| %>
+                <div class="form-check">
+                  <%= f.check_box "reviewer_ids[]", { class: "form-check-input", checked: true }, user.id, nil %>
+                  <%= f.label "reviewer_ids_#{user.id}", user.name, class: "form-check-label" %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <%= f.submit "Confirm Assignments", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div> 

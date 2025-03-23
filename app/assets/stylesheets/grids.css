@@ -53,14 +53,13 @@
   background-color: #ffe3e3;
 }
 
-/* Duplicate row highlighting */
 .grid-row-duplicate > .grid-cell {
-  background-color: #fff5f5;
-  border-color: #ffe3e3;
+  background-color: #f0f7ff;
+  border-color: #cce5ff;
 }
 
 .grid-row-duplicate:hover > .grid-cell {
-  background-color: #ffe3e3;
+  background-color: #e6f3ff;
 }
 
 /* Year headers */

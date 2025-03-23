@@ -19,7 +19,7 @@ class Scoring < ApplicationRecord
   enum :status, [:pending, :completed]
 
   before_save :calculate_overall_score
-  after_commit :broadcast_application_update
+  after_commit :broadcast_application_update, on: [:create, :update, :destroy]
 
   # Calculate the average score across the three main criteria
   def average_score
@@ -27,6 +27,10 @@ class Scoring < ApplicationRecord
     return nil if scores.empty?
 
     (scores.sum.to_f / scores.size).round(1)
+  end
+
+  def previously_completed?
+    status_previously_was == "completed"
   end
 
   private
@@ -45,5 +49,9 @@ class Scoring < ApplicationRecord
       partial: "scorings/application_row",
       locals: { application: application },
     )
+  end
+
+  def broadcast_update
+    application.broadcast_replace_later
   end
 end

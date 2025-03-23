@@ -25,6 +25,12 @@ class HomeController < ApplicationController
         path: scorings_path,
         icon: "grade",
       },
+      {
+        name: "Interview Selection",
+        description: "Select candidates for interviews based on average scores",
+        path: interview_selections_path,
+        icon: "people",
+      },
     ]
   end
 end

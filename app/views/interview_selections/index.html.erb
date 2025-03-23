@@ -1,0 +1,89 @@
+<div class="container mt-4">
+  <h1 class="mb-4">Interview Selection</h1>
+
+  <div class="alert alert-info mb-4">
+    <strong>Note:</strong> Applications are sorted by average score in descending order within each year.
+  </div>
+
+  <% @applications_by_year.sort.each do |year, applications| %>
+    <h2 class="mt-4 mb-3">Year <%= year %></h2>
+    <div class="reviews-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr 2fr">
+      <%# Headers %>
+      <div class="grid-header">First Name</div>
+      <div class="grid-header">Last Name</div>
+      <div class="grid-header">Faculty</div>
+      <div class="grid-header">Average Score</div>
+      <div class="grid-header">Actions</div>
+
+      <%# Rows %>
+      <% applications.each do |application| %>
+        <% avg_score = application.avg_score.round(2) %>
+        <div class="grid-row">
+          <div class="grid-cell"><%= application.first_name %></div>
+          <div class="grid-cell"><%= application.last_name %></div>
+          <div class="grid-cell"><%= application.faculty %></div>
+          <div class="grid-cell">
+            <span class="badge bg-<%= avg_score >= 4 ? 'success' : (avg_score < 3 ? 'danger' : 'warning') %>">
+              <%= avg_score %>/5
+            </span>
+          </div>
+          <div class="grid-cell">
+            <%= link_to "View", application_path(application), class: "btn btn-sm btn-primary" %>
+            <button type="button" class="btn btn-sm btn-info ms-1" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#scoringModal"
+                    data-application-id="<%= application.id %>"
+                    data-first-name="<%= application.first_name %>"
+                    data-last-name="<%= application.last_name %>"
+                    data-resume-url="<%= application.resume %>"
+                    onclick="updateScoringModal(this)">
+              Scoring Details
+            </button>
+            <% if application.resume.present? %>
+              <%= link_to "Resume", application.resume, target: "_blank", class: "btn btn-sm btn-secondary ms-1" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Single Scoring Details Modal -->
+  <div class="modal fade" id="scoringModal" tabindex="-1" aria-labelledby="scoringModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="scoringModalLabel">
+            Scoring Details
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalContent">
+          Loading...
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateScoringModal(button) {
+  const applicationId = button.dataset.applicationId;
+  const firstName = button.dataset.firstName;
+  const lastName = button.dataset.lastName;
+  const resumeUrl = button.dataset.resumeUrl;
+  
+  // Update modal title
+  document.getElementById('scoringModalLabel').textContent = `Scoring Details - ${firstName} ${lastName}`;
+  
+  // Fetch application details and scoring data
+  fetch(`/interview_selections/${applicationId}/details`)
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('modalContent').innerHTML = html;
+    });
+}
+</script> 

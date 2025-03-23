@@ -17,10 +17,18 @@ Rails.application.routes.draw do
   get "initial_reviews/create_pending/:id", to: "initial_reviews#create_pending", as: "create_pending_initial_review"
   post "initial_reviews/submit/:id", to: "initial_reviews#submit", as: "submit_review"
 
+  # Interview Selection routes
+  resources :interview_selections, only: [:index] do
+    member do
+      get "details"
+    end
+  end
+
   # Scoring routes
   resources :scorings, only: [:index] do
     collection do
       get "review_one"  # Route for getting next application to score
+      post "assign_reviewers"  # Route for assigning reviewers to year levels
     end
   end
   get "scorings/review/:id", to: "scorings#review", as: "review_scoring"
