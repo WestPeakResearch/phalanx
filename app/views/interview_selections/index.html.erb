@@ -29,14 +29,7 @@
           </div>
           <div class="grid-cell">
             <%= link_to "View", application_path(application), class: "btn btn-sm btn-primary" %>
-            <button type="button" class="btn btn-sm btn-info ms-1" 
-                    data-bs-toggle="modal" 
-                    data-bs-target="#scoringModal"
-                    data-application-id="<%= application.id %>"
-                    data-first-name="<%= application.first_name %>"
-                    data-last-name="<%= application.last_name %>"
-                    data-resume-url="<%= application.resume %>"
-                    onclick="updateScoringModal(this)">
+            <button type="button" class="btn btn-sm btn-info ms-1" data-bs-toggle="modal" data-bs-target="#scoringModal<%= application.id %>">
               Scoring Details
             </button>
             <% if application.resume.present? %>
@@ -44,46 +37,93 @@
             <% end %>
           </div>
         </div>
+
+        <!-- Scoring Details Modal -->
+        <div class="modal fade" id="scoringModal<%= application.id %>" tabindex="-1" aria-labelledby="scoringModalLabel<%= application.id %>" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="scoringModalLabel<%= application.id %>">
+                  Scoring Details - <%= application.first_name %> <%= application.last_name %>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <!-- Left column: Application details -->
+                  <div class="col-md-6">
+                    <h6 class="mb-3">Application Information</h6>
+                    <table class="table table-bordered">
+                      <tbody>
+                        <% Application.displayable_columns.each do |column| %>
+                          <tr>
+                            <th class="bg-light" style="width: 30%"><%= column.humanize %></th>
+                            <td>
+                              <% if column == "resume" && application.resume.present? %>
+                                <%= link_to application.resume, application.resume, target: "_blank" %>
+                              <% else %>
+                                <%= application.send(column) %>
+                              <% end %>
+                            </td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <!-- Right column: Resume preview -->
+                  <div class="col-md-6">
+                    <% if application.resume.present? %>
+                      <h6 class="mb-3">Resume Preview</h6>
+                      <div class="resume-preview" style="width: 100%; height: 400px;">
+                        <iframe 
+                          src="https://drive.google.com/file/d/<%= application.resume.split('id=').last %>/preview"
+                          style="width: 100%; height: 100%; border: none;"
+                          allow="autoplay">
+                        </iframe>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+
+                <!-- Scoring section -->
+                <div class="mt-4">
+                  <h6 class="mb-3">Scoring Details</h6>
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Reviewer</th>
+                          <th>Interest</th>
+                          <th>Alignment</th>
+                          <th>Polish</th>
+                          <th>Overall</th>
+                          <th>Comments</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% application.scorings.completed.includes(:user).each do |scoring| %>
+                          <tr>
+                            <td><%= scoring.user&.name || 'Unknown' %></td>
+                            <td><%= scoring.interest_score %></td>
+                            <td><%= scoring.alignment_score %></td>
+                            <td><%= scoring.polish_score %></td>
+                            <td><%= scoring.overall_score.round(1) %></td>
+                            <td><%= scoring.comments %></td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
       <% end %>
     </div>
   <% end %>
-
-  <!-- Single Scoring Details Modal -->
-  <div class="modal fade" id="scoringModal" tabindex="-1" aria-labelledby="scoringModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="scoringModalLabel">
-            Scoring Details
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" id="modalContent">
-          Loading...
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-function updateScoringModal(button) {
-  const applicationId = button.dataset.applicationId;
-  const firstName = button.dataset.firstName;
-  const lastName = button.dataset.lastName;
-  const resumeUrl = button.dataset.resumeUrl;
-  
-  // Update modal title
-  document.getElementById('scoringModalLabel').textContent = `Scoring Details - ${firstName} ${lastName}`;
-  
-  // Fetch application details and scoring data
-  fetch(`/interview_selections/${applicationId}/details`)
-    .then(response => response.text())
-    .then(html => {
-      document.getElementById('modalContent').innerHTML = html;
-    });
-}
-</script> 
+</div> 

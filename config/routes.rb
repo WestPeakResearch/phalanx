@@ -18,11 +18,7 @@ Rails.application.routes.draw do
   post "initial_reviews/submit/:id", to: "initial_reviews#submit", as: "submit_review"
 
   # Interview Selection routes
-  resources :interview_selections, only: [:index] do
-    member do
-      get "details"
-    end
-  end
+  resources :interview_selections, only: [:index]
 
   # Scoring routes
   resources :scorings, only: [:index] do
