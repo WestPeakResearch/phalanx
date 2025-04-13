@@ -1,0 +1,10 @@
+<%= turbo_stream.replace dom_id(@application, :interview_selection) do %>
+  <%= form_with(model: @application, url: update_interview_selection_interview_selection_path(@application), method: :patch) do |f| %>
+    <%= check_box_tag :selected, '1', @application.selected_for_interview, 
+        data: { 
+          controller: "checkbox-submit",
+          action: "change->checkbox-submit#submit"
+        },
+        class: "form-check-input" %>
+  <% end %>
+<% end %> 

@@ -35,10 +35,9 @@ class Scoring < ApplicationRecord
 
   private
 
-  # Calculate the overall score as the average of the three main scores
   def calculate_overall_score
     if status == "completed" && interest_score.present? && alignment_score.present? && polish_score.present?
-      self.overall_score = ((interest_score + alignment_score + polish_score) / 3.0).round(1)
+      self.overall_score = ((interest_score + alignment_score + polish_score) / 3.0).round(2)
     end
   end
 

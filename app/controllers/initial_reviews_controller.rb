@@ -19,6 +19,9 @@ class InitialReviewsController < ApplicationController
   def assign
     @reviewers = User.all  # You might want to filter this based on roles
 
+    # Debug output to help us troubleshoot
+    Rails.logger.info "ASSIGN METHOD CALLED: #{request.method}"
+
     if request.post?
       selected_reviewer_ids = params[:reviewer_ids] || []
       selected_reviewers = User.where(id: selected_reviewer_ids)
@@ -49,8 +52,13 @@ class InitialReviewsController < ApplicationController
         # Render the preview
         respond_to do |format|
           format.turbo_stream
+          format.html { render :assign }
         end
       end
+    else
+      # For GET requests, just render the assign template
+      # The instance variables are set at the top of the method
+      render :assign
     end
   end
 
@@ -224,7 +232,7 @@ class InitialReviewsController < ApplicationController
     end
 
     # Broadcast the update
-    Turbo::StreamsChannel.broadcast_update_to(
+    Turbo::StreamsChannel.broadcast_replace_to(
       "applications",
       target: "batch_assign_section",
       partial: "initial_reviews/batch_assign_section",

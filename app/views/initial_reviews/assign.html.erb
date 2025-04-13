@@ -9,7 +9,7 @@
         ensuring each application gets different reviewers and the workload is balanced.
       </div>
 
-      <%= form_tag assign_initial_reviews_path, method: :post, data: { turbo: true } do %>
+      <%= form_tag assign_initial_reviews_path, method: :post, data: { turbo: false } do %>
         <div class="mb-4">
           <h3>Select Reviewers</h3>
           <div class="mb-2">

@@ -3,14 +3,5 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   before_action :authenticate_user!
-
-  protected
-
-  def authenticate_user!
-    if user_signed_in?
-      super
-    else
-      redirect_to new_login_path, notice: "Please sign in to continue"
-    end
-  end
+  skip_before_action :authenticate_user!, if: :devise_controller?
 end

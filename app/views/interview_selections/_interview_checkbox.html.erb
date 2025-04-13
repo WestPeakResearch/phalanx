@@ -1,0 +1,15 @@
+<div id="interview_selection_<%= application.id %>">
+  <%= form_with(
+        url: update_interview_selection_interview_selection_path(application),
+        method: :patch,
+        data: { turbo: true }
+      ) do |f| %>
+    <%= f.check_box :selected, 
+        checked: application.selected_for_interview,
+        data: { 
+          controller: "checkbox-submit",
+          action: "change->checkbox-submit#submit"
+        },
+        class: "form-check-input" %>
+  <% end %>
+</div>

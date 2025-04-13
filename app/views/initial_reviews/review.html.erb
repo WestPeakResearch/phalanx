@@ -22,6 +22,12 @@
 
   <div class="card mb-4">
     <div class="card-body">
+      <% if @application.position.present? %>
+        <div class="alert alert-primary mb-4">
+          <h5 class="mb-0"><strong>Position:</strong> <%= @application.position %></h5>
+        </div>
+      <% end %>
+      
       <% if @application.resume.present? %>
         <div class="resume-preview mb-4" style="width: 100%; height: 600px;">
           <iframe 

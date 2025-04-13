@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  devise_for :users, only: []
+  devise_for :users
 
   root "home#index"
 
@@ -18,7 +18,15 @@ Rails.application.routes.draw do
   post "initial_reviews/submit/:id", to: "initial_reviews#submit", as: "submit_review"
 
   # Interview Selection routes
-  resources :interview_selections, only: [:index]
+  resources :interview_selections, only: [:index] do
+    collection do
+      get :export_selected
+    end
+    member do
+      patch :update_interview_selection
+      get :scoring_modal
+    end
+  end
 
   # Scoring routes
   resources :scorings, only: [:index] do
@@ -35,10 +43,6 @@ Rails.application.routes.draw do
   resources :documents, only: [:new, :create, :destroy] do
     get :export, on: :collection
   end
-
-  # Login routes
-  resources :logins, only: [:new, :create, :destroy]
-  get "logins", to: "logins#show", as: "login_with_token"  # For handling ?token=xyz
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
