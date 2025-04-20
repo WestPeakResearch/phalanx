@@ -2,7 +2,7 @@
   <h1 class="mb-4">Initial Review Overview</h1>
 
   <p>Reviews with at least one red 'Reject' will not pass to the next round.</p>
-  <p>All other applications will be sent to the interview round.</p>
+  <p>All other applications will be sent to the further review round.</p>
 
   <%
     # Find applications with pending reviews assigned to the current user
@@ -34,8 +34,7 @@
     <h2 class="year-header">Year <%= year %></h2>
     <div class="reviews-grid">
       <%# Headers %>
-      <div class="grid-header">First Name</div>
-      <div class="grid-header">Last Name</div>
+      <div class="grid-header">Name</div>
       <div class="grid-header">Review Status</div>
       <div class="grid-header">Actions</div>
       <div class="grid-header">Review</div>

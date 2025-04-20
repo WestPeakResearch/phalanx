@@ -12,13 +12,11 @@ class Scoring < ApplicationRecord
   validates :interest_score, inclusion: { in: SCORE_RANGE }, allow_nil: true
   validates :alignment_score, inclusion: { in: SCORE_RANGE }, allow_nil: true
   validates :polish_score, inclusion: { in: SCORE_RANGE }, allow_nil: true
-  validates :overall_score, inclusion: { in: SCORE_RANGE }, allow_nil: true
   validates :status, presence: true
 
   # Enum for the scoring status (pending: 0, completed: 1)
   enum :status, [:pending, :completed]
 
-  before_save :calculate_overall_score
   after_commit :broadcast_application_update, on: [:create, :update, :destroy]
 
   # Calculate the average score across the three main criteria
@@ -26,7 +24,7 @@ class Scoring < ApplicationRecord
     scores = [interest_score, alignment_score, polish_score].compact
     return nil if scores.empty?
 
-    (scores.sum.to_f / scores.size).round(1)
+    (scores.sum.to_f / scores.size).round(2)
   end
 
   def previously_completed?
@@ -34,12 +32,6 @@ class Scoring < ApplicationRecord
   end
 
   private
-
-  def calculate_overall_score
-    if status == "completed" && interest_score.present? && alignment_score.present? && polish_score.present?
-      self.overall_score = ((interest_score + alignment_score + polish_score) / 3.0).round(2)
-    end
-  end
 
   def broadcast_application_update
     Turbo::StreamsChannel.broadcast_replace_to(

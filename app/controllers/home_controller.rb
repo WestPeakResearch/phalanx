@@ -9,19 +9,19 @@ class HomeController < ApplicationController
       },
       {
         name: "Applications Overview",
-        description: "View and manage all applications",
+        description: "View all applications",
         path: applications_path,
         icon: "list_alt",
       },
       {
         name: "Initial Review",
-        description: "First round of application reviews",
+        description: "Quick filter to screen out applications",
         path: initial_reviews_path,
         icon: "rate_review",
       },
       {
         name: "Scoring",
-        description: "Score applications based on detailed criteria",
+        description: "Score applications in detail",
         path: scorings_path,
         icon: "grade",
       },

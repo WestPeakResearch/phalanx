@@ -14,9 +14,9 @@ namespace :scoring do
     pending_scorings.each do |scoring|
       scoring.update!(
         status: :completed,
-        interest_score: rand(1..5),
-        alignment_score: rand(1..5),
-        polish_score: rand(1..5),
+        interest_score: (rand * 4 + 1).round(2),
+        alignment_score: (rand * 4 + 1).round(2),
+        polish_score: (rand * 4 + 1).round(2),
         comments: "Auto-generated random scoring",
       )
       print "."

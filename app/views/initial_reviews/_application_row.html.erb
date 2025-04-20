@@ -5,8 +5,7 @@
   negative_highlight = has_no && !has_yes ? 'grid-row-negative' : ''
 %>
 <div class="grid-row <%= negative_highlight %>" id="application_<%= application.id %>">
-  <div class="grid-cell"><%= application.first_name %></div>
-  <div class="grid-cell"><%= application.last_name %></div>
+  <div class="grid-cell"><%= application.first_name %> <%= application.last_name %></div>
   <div class="grid-cell">
     <%= render 'initial_reviews/review_boxes', reviews: sorted_reviews %>
   </div>

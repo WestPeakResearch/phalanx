@@ -1,0 +1,25 @@
+<div id="application_row_<%= application.id %>" class="grid-row <%= 'selected-for-interview' if application.selected_for_interview %>">
+  <div class="grid-cell"><%= application.first_name %> <%= application.last_name %></div>
+  <div class="grid-cell"><%= application.faculty %></div>
+  <div class="grid-cell"><%= application.position %></div>
+  <div class="grid-cell">
+    <% score_class = overall_score >= 4 ? 'high' : (overall_score < 3 ? 'low' : 'medium') %>
+    <div class="score-box score-<%= score_class %>">
+      <%= overall_score %>
+    </div>
+  </div>
+  <div class="grid-cell">
+    <%= turbo_frame_tag "interview_selection_#{application.id}" do %>
+      <%= render "interview_selections/interview_checkbox", application: application %>
+    <% end %>
+  </div>
+  <div class="grid-cell">
+    <%= link_to "View", application_path(application), class: "btn btn-sm btn-primary" %>
+    <button type="button" class="btn btn-sm btn-info ms-1" data-bs-toggle="modal" data-bs-target="#scoringModal<%= application.id %>">
+      Scoring Details
+    </button>
+    <% if application.resume.present? %>
+      <%= link_to "Resume", application.resume, target: "_blank", class: "btn btn-sm btn-secondary ms-1" %>
+    <% end %>
+  </div>
+</div> 

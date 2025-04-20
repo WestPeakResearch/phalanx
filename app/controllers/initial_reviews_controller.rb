@@ -33,32 +33,20 @@ class InitialReviewsController < ApplicationController
         .left_joins(:initial_reviews)
         .group("applications.id")
 
-      @assignments = assign_reviews(applications, selected_reviewers)
+      assignments = assign_reviews(applications, selected_reviewers)
 
-      if params[:confirm] == "true"
-        # Perform the assignments in a transaction
-        ActiveRecord::Base.transaction do
-          @assignments.each do |application, reviewer|
-            application.initial_reviews.create!(
-              decision: :pending,
-              user: reviewer,
-            )
-          end
-        end
-
-        redirect_to initial_reviews_path,
-                    notice: "Successfully assigned #{@assignments.count} reviews to #{selected_reviewers.count} reviewers"
-      else
-        # Render the preview
-        respond_to do |format|
-          format.turbo_stream
-          format.html { render :assign }
+      # Perform the assignments in a transaction
+      ActiveRecord::Base.transaction do
+        assignments.each do |application, reviewer|
+          application.initial_reviews.create!(
+            decision: :pending,
+            user: reviewer,
+          )
         end
       end
-    else
-      # For GET requests, just render the assign template
-      # The instance variables are set at the top of the method
-      render :assign
+
+      redirect_to initial_reviews_path,
+                  notice: "Successfully assigned #{assignments.count} reviews to #{selected_reviewers.count} reviewers"
     end
   end
 

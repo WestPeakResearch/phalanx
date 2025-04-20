@@ -8,9 +8,9 @@ class InterviewSelectionsController < ApplicationController
       .joins(:scorings)
       .where(scorings: { status: :completed })
       .group("applications.id")
-      .select("applications.*, AVG(scorings.overall_score) as avg_score")
+      .select("applications.*, AVG((scorings.interest_score + scorings.alignment_score + scorings.polish_score)/3.0) as overall_score")
       .group_by(&:year)
-      .transform_values { |apps| apps.sort_by(&:avg_score).reverse }
+      .transform_values { |apps| apps.sort_by(&:overall_score).reverse }
   end
 
   def details
@@ -37,7 +37,7 @@ class InterviewSelectionsController < ApplicationController
       .joins(:scorings)
       .where(scorings: { status: :completed })
       .group("applications.id")
-      .select("applications.*, AVG(scorings.overall_score) as avg_score")
+      .select("applications.*, AVG((scorings.interest_score + scorings.alignment_score + scorings.polish_score)/3.0) as overall_score")
 
     # Create a new workbook
     workbook = RubyXL::Workbook.new
@@ -79,7 +79,7 @@ class InterviewSelectionsController < ApplicationController
       # Process each year group
       apps_by_year.each do |year, year_apps|
         # Sort apps by score in descending order
-        sorted_apps = year_apps.sort_by { |app| -app.avg_score }
+        sorted_apps = year_apps.sort_by { |app| -app.overall_score }
 
         # Add applications for this year
         sorted_apps.each do |app|
@@ -88,7 +88,7 @@ class InterviewSelectionsController < ApplicationController
           worksheet.add_cell(current_row, 2, app.year)
           worksheet.add_cell(current_row, 3, app.email)
           worksheet.add_cell(current_row, 4, app.position)
-          worksheet.add_cell(current_row, 5, app.avg_score.round(2))
+          worksheet.add_cell(current_row, 5, app.overall_score.round(2))
           current_row += 1
         end
 
@@ -117,7 +117,7 @@ class InterviewSelectionsController < ApplicationController
       # Process each year group
       all_apps_by_year.each do |year, year_apps|
         # Sort apps by score in descending order
-        sorted_apps = year_apps.sort_by { |app| -app.avg_score }
+        sorted_apps = year_apps.sort_by { |app| -app.overall_score }
 
         # Add applications for this year
         sorted_apps.each do |app|
@@ -126,7 +126,7 @@ class InterviewSelectionsController < ApplicationController
           all_worksheet.add_cell(current_row, 2, app.year)
           all_worksheet.add_cell(current_row, 3, app.email)
           all_worksheet.add_cell(current_row, 4, app.position)
-          all_worksheet.add_cell(current_row, 5, app.avg_score.round(2))
+          all_worksheet.add_cell(current_row, 5, app.overall_score.round(2))
           current_row += 1
         end
 
@@ -156,7 +156,7 @@ class InterviewSelectionsController < ApplicationController
       # Process each year group
       all_apps_by_year.each do |year, year_apps|
         # Sort apps by score in descending order
-        sorted_apps = year_apps.sort_by { |app| -app.avg_score }
+        sorted_apps = year_apps.sort_by { |app| -app.overall_score }
 
         # Add applications for this year
         sorted_apps.each do |app|
@@ -165,7 +165,7 @@ class InterviewSelectionsController < ApplicationController
           worksheet.add_cell(current_row, 2, app.year)
           worksheet.add_cell(current_row, 3, app.email)
           worksheet.add_cell(current_row, 4, app.position || "")
-          worksheet.add_cell(current_row, 5, app.avg_score.round(2))
+          worksheet.add_cell(current_row, 5, app.overall_score.round(2))
           current_row += 1
         end
 
@@ -184,33 +184,46 @@ class InterviewSelectionsController < ApplicationController
 
   def update_interview_selection
     @application = Application.find(params[:id])
-    success = @application.update(selected_for_interview: params[:selected] == "1")
+
+    # Only change to selected/deselected based on the button pressed
+    # This prevents race conditions because actions are absolute rather than toggles
+    new_status = params[:selected] == "1"
+    @application.update(selected_for_interview: new_status)
+
     @selected_count = Application.where(selected_for_interview: true).count
+    @overall_score = @application.scorings.completed.average("(interest_score + alignment_score + polish_score)/3.0").to_f.round(2)
+
+    # Broadcast the updates to all clients
+    Turbo::StreamsChannel.broadcast_update_to(
+      "interview_selections",
+      target: "selected_count",
+      partial: "interview_selections/selected_count",
+      locals: { selected_count: @selected_count },
+    )
+
+    # Broadcast the entire row to update highlighting
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "interview_selections",
+      target: "application_row_#{@application.id}",
+      partial: "interview_selections/application_row",
+      locals: { application: @application, overall_score: @overall_score },
+    )
 
     respond_to do |format|
-      if success
-        format.turbo_stream {
-          render turbo_stream: turbo_stream.multi(
-            turbo_stream.replace(
-              "interview_selection_#{@application.id}",
-              partial: "interview_checkbox",
-              locals: { application: @application },
-            ),
-            turbo_stream.update(
-              "selected_count",
-              partial: "selected_count",
-              locals: { selected_count: @selected_count },
-            )
-          )
-        }
-      else
-        format.turbo_stream {
-          render turbo_stream: turbo_stream.replace(
-            "interview_selection_#{@application.id}",
-            partial: "interview_checkbox",
-            locals: { application: @application },
-          )
-        }
+      # Use render with an array of turbo_stream helpers instead of turbo_stream.multi
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace(
+            "application_row_#{@application.id}",
+            partial: "interview_selections/application_row",
+            locals: { application: @application, overall_score: @overall_score },
+          ),
+          turbo_stream.update(
+            "selected_count",
+            partial: "interview_selections/selected_count",
+            locals: { selected_count: @selected_count },
+          ),
+        ]
       end
     end
   end

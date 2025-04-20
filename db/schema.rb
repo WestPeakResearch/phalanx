@@ -80,10 +80,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_151146) do
   create_table "scorings", force: :cascade do |t|
     t.integer "application_id", null: false
     t.integer "user_id", null: false
-    t.integer "interest_score"
-    t.integer "alignment_score"
-    t.integer "polish_score"
-    t.integer "overall_score"
+    t.decimal "interest_score", precision: 3, scale: 2
+    t.decimal "alignment_score", precision: 3, scale: 2
+    t.decimal "polish_score", precision: 3, scale: 2
     t.integer "status", default: 0, null: false
     t.text "comments"
     t.datetime "created_at", null: false

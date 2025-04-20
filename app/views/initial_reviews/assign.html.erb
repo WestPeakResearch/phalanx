@@ -35,15 +35,12 @@
         
         <div class="d-flex justify-content-between">
           <%= link_to "Back to Reviews", initial_reviews_path, class: "btn btn-secondary" %>
-          <%= submit_tag "Preview Assignments", class: "btn btn-primary" %>
+          <%= submit_tag "Assign Reviews", class: "btn btn-primary" %>
         </div>
       <% end %>
     </div>
   </div>
 </div>
-
-<%# Modal container %>
-<div id="preview_modal"></div>
 
 <script>
 function selectAllReviewers() {
@@ -52,9 +49,5 @@ function selectAllReviewers() {
 
 function deselectAllReviewers() {
   document.querySelectorAll('.reviewer-checkbox').forEach(checkbox => checkbox.checked = false);
-}
-
-function closePreviewModal() {
-  document.getElementById('preview_modal').innerHTML = '';
 }
 </script> 

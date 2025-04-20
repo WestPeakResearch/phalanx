@@ -1,4 +1,6 @@
 <div class="container mt-4">
+  <%= turbo_stream_from "interview_selections" %>
+  
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Interview Selection</h1>
     <div id="selected_count">
@@ -6,16 +8,18 @@
     </div>
   </div>
 
+  <p>Select applicants to be invited for interviews. When ready, click Export to export the list of selected applications.</p>
+  <p>Move the list back to Hiring Master to continue with interviews. Good luck!</p>
+
   <div class="alert alert-info mb-4">
     <strong>Note:</strong> Applications are sorted by average score in descending order within each year.
   </div>
 
   <% @applications_by_year.sort.each do |year, applications| %>
     <h2 class="mt-4 mb-3">Year <%= year %></h2>
-    <div class="reviews-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 2fr">
+    <div class="reviews-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2fr">
       <%# Headers %>
-      <div class="grid-header">First Name</div>
-      <div class="grid-header">Last Name</div>
+      <div class="grid-header">Name</div>
       <div class="grid-header">Faculty</div>
       <div class="grid-header">Position</div>
       <div class="grid-header">Average Score</div>
@@ -24,32 +28,8 @@
 
       <%# Rows %>
       <% applications.each do |application| %>
-        <% avg_score = application.avg_score.round(2) %>
-        <div class="grid-row">
-          <div class="grid-cell"><%= application.first_name %></div>
-          <div class="grid-cell"><%= application.last_name %></div>
-          <div class="grid-cell"><%= application.faculty %></div>
-          <div class="grid-cell"><%= application.position %></div>
-          <div class="grid-cell">
-            <span class="badge bg-<%= avg_score >= 4 ? 'success' : (avg_score < 3 ? 'danger' : 'warning') %>">
-              <%= avg_score %>/5
-            </span>
-          </div>
-          <div class="grid-cell">
-            <%= turbo_frame_tag "interview_selection_#{application.id}" do %>
-              <%= render "interview_checkbox", application: application %>
-            <% end %>
-          </div>
-          <div class="grid-cell">
-            <%= link_to "View", application_path(application), class: "btn btn-sm btn-primary" %>
-            <button type="button" class="btn btn-sm btn-info ms-1" data-bs-toggle="modal" data-bs-target="#scoringModal<%= application.id %>">
-              Scoring Details
-            </button>
-            <% if application.resume.present? %>
-              <%= link_to "Resume", application.resume, target: "_blank", class: "btn btn-sm btn-secondary ms-1" %>
-            <% end %>
-          </div>
-        </div>
+        <% overall_score = application.overall_score %>
+        <%= render "interview_selections/application_row", application: application, overall_score: overall_score %>
 
         <!-- Scoring Details Modal -->
         <div class="modal fade" id="scoringModal<%= application.id %>" tabindex="-1" aria-labelledby="scoringModalLabel<%= application.id %>" aria-hidden="true">
@@ -90,7 +70,7 @@
                       <h6 class="mb-3">Resume Preview</h6>
                       <div class="resume-preview" style="width: 100%; height: 400px;">
                         <iframe 
-                          src="https://drive.google.com/file/d/<%= application.resume.split('id=').last %>/preview"
+                          data-src="https://drive.google.com/file/d/<%= application.resume.split('id=').last %>/preview"
                           style="width: 100%; height: 100%; border: none;"
                           allow="autoplay">
                         </iframe>
@@ -102,6 +82,15 @@
                 <!-- Scoring section -->
                 <div class="mt-4">
                   <h6 class="mb-3">Scoring Details</h6>
+                  
+                  <!-- Overall Score Box -->
+                  <div class="mb-3">
+                    <% score_class = overall_score >= 4 ? 'high' : (overall_score < 3 ? 'low' : 'medium') %>
+                    <div class="score-box score-<%= score_class %>">
+                      <%= overall_score %>
+                    </div>
+                  </div>
+                  
                   <div class="table-responsive">
                     <table class="table table-bordered">
                       <thead>
@@ -118,10 +107,10 @@
                         <% application.scorings.completed.includes(:user).each do |scoring| %>
                           <tr>
                             <td><%= scoring.user&.name || 'Unknown' %></td>
-                            <td><%= scoring.interest_score %></td>
-                            <td><%= scoring.alignment_score %></td>
-                            <td><%= scoring.polish_score %></td>
-                            <td><%= scoring.overall_score.round(1) %></td>
+                            <td><%= number_with_precision(scoring.interest_score, precision: 2) %></td>
+                            <td><%= number_with_precision(scoring.alignment_score, precision: 2) %></td>
+                            <td><%= number_with_precision(scoring.polish_score, precision: 2) %></td>
+                            <td><%= scoring.average_score %></td>
                             <td><%= scoring.comments %></td>
                           </tr>
                         <% end %>
@@ -139,4 +128,28 @@
       <% end %>
     </div>
   <% end %>
-</div> 
+</div>
+
+<script>
+  // Load iframe content only when modal is opened
+  document.addEventListener('show.bs.modal', function(event) {
+    const modal = event.target;
+    const iframe = modal.querySelector('iframe[data-src]');
+    
+    if (iframe && !iframe.src) {
+      iframe.src = iframe.dataset.src;
+    }
+  });
+  
+  // Prevent scroll jumping when checkboxes are clicked
+  document.addEventListener('turbo:before-fetch-request', function() {
+    window.scrollPosition = window.scrollY;
+  });
+  
+  document.addEventListener('turbo:frame-render', function() {
+    if (window.scrollPosition !== undefined) {
+      window.scrollTo(0, window.scrollPosition);
+      window.scrollPosition = undefined;
+    }
+  });
+</script> 
